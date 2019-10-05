@@ -2,7 +2,7 @@
 {
     public class FailedCounterDecorator : BaseAuthenticationDecorator
     {
-        private IFailCounter _FailCounter;
+        private readonly IFailCounter _FailCounter;
 
         public FailedCounterDecorator(IAuthentication authentication, IFailCounter failCounter) : base(authentication)
         {
@@ -16,12 +16,21 @@
             {
                 ResetFailedCount(accountId);
             }
+            else
+            {
+                AddFailedCount(accountId);
+            }
             return isValid;
         }
 
         public void ResetFailedCount(string accountId)
         {
             _FailCounter.ResetFailedCount(accountId);
+        }
+
+        public void AddFailedCount(string accountId)
+        {
+            _FailCounter.AddFailedCount(accountId);
         }
     }
 }

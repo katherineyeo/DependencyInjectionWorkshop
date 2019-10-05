@@ -7,8 +7,6 @@
         private readonly IOtp _Otp;
         private readonly IFailCounter _FailCounter;
         private readonly ILogger _Logger;
-        private readonly IAuthentication _NotificationDecorator;
-        private readonly FailedCounterDecorator _FailedCounterDecorator;
 
         public AuthenticationService(IProfileDao profileDao, IHash hash, IOtp otp, IFailCounter failCounter, ILogger logger)
         {
@@ -50,7 +48,7 @@
             }
             else
             {
-                _FailCounter.AddFailedCount(accountId);
+                //_FailedCounterDecorator.AddFailedCount(accountId);
 
                 LogFailedCount(accountId);
 
