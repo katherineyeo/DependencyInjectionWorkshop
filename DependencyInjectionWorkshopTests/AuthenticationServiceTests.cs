@@ -43,6 +43,18 @@ namespace DependencyInjectionWorkshopTests
             ShouldBeValid(_DefaultAccount, _DefaultPassword, _DefaultOtp);
         }
 
+        private bool WhenValid()
+        {
+            GivenPassword(_DefaultAccount, _DefaultHashedPassword);
+
+            GivenHash(_DefaultPassword, _DefaultHashedPassword);
+
+            GivenOtp(_DefaultAccount, _DefaultOtp);
+
+            var isValid = _AuthenticationService.Verify(_DefaultAccount, _DefaultPassword, _DefaultOtp);
+            return isValid;
+        }
+
         [Test]
         public void is_invalid()
         {
@@ -71,6 +83,18 @@ namespace DependencyInjectionWorkshopTests
         {
             WhenInvalid();
             ShouldNotify(_DefaultAccount);
+        }
+
+        [Test]
+        public void should_reset_failedcount_when_valid()
+        {
+            WhenValid();
+            ShouldResetFailCount(_DefaultAccount);
+        }
+
+        private void ShouldResetFailCount(string account)
+        {
+            _FailCounter.Received(1).ResetFailedCount(Arg.Is<string>(a => a.Contains(account)));
         }
 
         private void ShouldNotify(string account)
