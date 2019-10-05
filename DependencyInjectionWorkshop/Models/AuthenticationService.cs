@@ -8,9 +8,11 @@
         private readonly IFailCounter _FailCounter;
         private readonly ILogger _Logger;
         private readonly IAuthentication _NotificationDecorator;
+        private readonly FailedCounterDecorator _FailedCounterDecorator;
 
         public AuthenticationService(IProfileDao profileDao, IHash hash, IOtp otp, IFailCounter failCounter, ILogger logger)
         {
+            //_FailedCounterDecorator = new FailedCounterDecorator(this);
             _ProfileDao = profileDao;
             _Hash = hash;
             _Otp = otp;
@@ -20,6 +22,7 @@
 
         public AuthenticationService()
         {
+            //_FailedCounterDecorator = new FailedCounterDecorator(this);
             _ProfileDao = new ProfileDao();
             _Hash = new Sha256Adapter();
             _Otp = new Otp();
@@ -42,7 +45,7 @@
 
             if (passwordFromDb == hashedPassword && otp == currentOtp)
             {
-                _FailCounter.ResetFailedCount(accountId);
+                //_FailedCounterDecorator.ResetFailedCount(accountId);
                 return true;
             }
             else
