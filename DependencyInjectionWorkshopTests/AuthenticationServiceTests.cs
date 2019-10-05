@@ -52,7 +52,7 @@ namespace DependencyInjectionWorkshopTests
 
             GivenOtp(_DefaultAccount, _DefaultOtp);
 
-            ShouldBeInvalid(_DefaultAccount, _DefaultPassword, _DefaultOtp);
+            ShouldBeInvalid(_DefaultAccount, _DefaultPassword, "wrong otp");
         }
 
         private bool WhenInvalid()
