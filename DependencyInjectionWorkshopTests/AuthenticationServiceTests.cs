@@ -1,7 +1,7 @@
-﻿using System;
-using DependencyInjectionWorkshop.Models;
+﻿using DependencyInjectionWorkshop.Models;
 using NSubstitute;
 using NUnit.Framework;
+using System;
 
 namespace DependencyInjectionWorkshopTests
 {
@@ -12,6 +12,7 @@ namespace DependencyInjectionWorkshopTests
         private const string _DefaultAccount = "joey";
         private const string _DefaultOtp = "123";
         private const string _DefaultPassword = "abc";
+        private const int _DefaultFailedCount = 3;
         private IProfileDao _ProfileDao;
         private IOtp _Otp;
         private IHash _Hash;
@@ -106,6 +107,26 @@ namespace DependencyInjectionWorkshopTests
             WhenAccountIsLocked(true);
 
             ShouldThrow<FailedTooManyTimesException>();
+        }
+
+        [Test]
+        public void log_failed_count_when_invalid()
+        {
+            GivenFailedCount(_DefaultFailedCount);
+            WhenInvalid();
+            ShouldLogFailedCount(_DefaultAccount, _DefaultFailedCount);
+
+        }
+
+        private void ShouldLogFailedCount(string account, int failedCount)
+        {
+            _Logger.Received(1)
+                .LogInfo(Arg.Is<string>(s => s.Contains(account) && s.Contains(failedCount.ToString())));
+        }
+
+        private void GivenFailedCount(int failedCount)
+        {
+            _FailCounter.GetFailedCount(Arg.Is<string>(s => s.Contains(_DefaultAccount))).Returns(failedCount);
         }
 
         private void ShouldThrow<TException>() where TException : Exception

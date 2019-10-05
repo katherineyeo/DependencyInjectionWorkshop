@@ -62,7 +62,7 @@
         private void LogFailedCount(string accountId)
         {
             var failedCount = _FailCounter.GetFailedCount(accountId);
-            _Logger.LogInfo(accountId, failedCount);
+            _Logger.LogInfo($"accountId:{accountId} failed times:{failedCount}");
         }
     }
 }
