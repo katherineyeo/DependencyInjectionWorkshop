@@ -1,25 +1,19 @@
 ﻿namespace DependencyInjectionWorkshop.Models
 {
-    public interface IAuthentication
-    {
-        bool Verify(string accountId, string password, string otp);
-    }
-
     public class AuthenticationService : IAuthentication
     {
         private readonly IProfileDao _ProfileDao;
         private readonly IHash _Hash;
         private readonly IOtp _Otp;
-        private readonly INotification _Notification;
         private readonly IFailCounter _FailCounter;
         private readonly ILogger _Logger;
+        private readonly IAuthentication _NotificationDecorator;
 
-        public AuthenticationService(IProfileDao profileDao, IHash hash, IOtp otp, INotification notification, IFailCounter failCounter, ILogger logger)
+        public AuthenticationService(IProfileDao profileDao, IHash hash, IOtp otp, IFailCounter failCounter, ILogger logger)
         {
             _ProfileDao = profileDao;
             _Hash = hash;
             _Otp = otp;
-            _Notification = notification;
             _FailCounter = failCounter;
             _Logger = logger;
         }
@@ -29,7 +23,6 @@
             _ProfileDao = new ProfileDao();
             _Hash = new Sha256Adapter();
             _Otp = new Otp();
-            _Notification = new Notification();
             _FailCounter = new FailCounter();
             _Logger = new NLoggerAdapter();
         }
@@ -57,8 +50,6 @@
                 _FailCounter.AddFailedCount(accountId);
 
                 LogFailedCount(accountId);
-
-                _Notification.Notify($"{accountId} try to login, failed");
 
                 return false;
             }
