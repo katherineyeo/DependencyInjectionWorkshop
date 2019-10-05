@@ -10,7 +10,6 @@
 
         public AuthenticationService(IProfileDao profileDao, IHash hash, IOtp otp, IFailCounter failCounter, ILogger logger)
         {
-            //_FailedCounterDecorator = new FailedCounterDecorator(this);
             _ProfileDao = profileDao;
             _Hash = hash;
             _Otp = otp;
@@ -20,7 +19,6 @@
 
         public AuthenticationService()
         {
-            //_FailedCounterDecorator = new FailedCounterDecorator(this);
             _ProfileDao = new ProfileDao();
             _Hash = new Sha256Adapter();
             _Otp = new Otp();
@@ -30,11 +28,6 @@
 
         public bool Verify(string accountId, string password, string otp)
         {
-            if (_FailCounter.IsAccountLocked(accountId))
-            {
-                throw new FailedTooManyTimesException();
-            }
-
             var passwordFromDb = _ProfileDao.GetPassword(accountId);
 
             var hashedPassword = _Hash.ComputeHash(password);
@@ -43,15 +36,11 @@
 
             if (passwordFromDb == hashedPassword && otp == currentOtp)
             {
-                //_FailedCounterDecorator.ResetFailedCount(accountId);
                 return true;
             }
             else
             {
-                //_FailedCounterDecorator.AddFailedCount(accountId);
-
                 LogFailedCount(accountId);
-
                 return false;
             }
         }
