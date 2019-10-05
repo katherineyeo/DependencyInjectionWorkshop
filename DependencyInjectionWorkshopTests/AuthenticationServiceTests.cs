@@ -89,17 +89,29 @@ namespace DependencyInjectionWorkshopTests
         public void should_reset_failedcount_when_valid()
         {
             WhenValid();
-            ShouldResetFailCount(_DefaultAccount);
+            ShouldResetFailedCount(_DefaultAccount);
         }
 
-        private void ShouldResetFailCount(string account)
+        [Test]
+        public void should_add_failedcount_when_invalid()
+        {
+            WhenInvalid();
+            ShouldAddFailedCount(_DefaultAccount);
+        }
+
+        private void ShouldAddFailedCount(string account)
+        {
+            _FailCounter.Received().AddFailedCount(Arg.Is<string>(s => s.Contains(account)));
+        }
+
+        private void ShouldResetFailedCount(string account)
         {
             _FailCounter.Received(1).ResetFailedCount(Arg.Is<string>(a => a.Contains(account)));
         }
 
         private void ShouldNotify(string account)
         {
-            _Notification.Received(1).Notify(Arg.Is<string>(message => message.Contains(account)));
+            _Notification.Received(1).Notify(Arg.Is<string>(m => m.Contains(account)));
         }
 
         private void ShouldBeValid(string account, string password, string otp)
