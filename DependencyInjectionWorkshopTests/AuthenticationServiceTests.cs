@@ -39,10 +39,56 @@ namespace DependencyInjectionWorkshopTests
             GivenHash(_DefaultPassword, _DefaultHashedPassword);
 
             GivenOtp(_DefaultAccount, _DefaultOtp);
-            
-            var isValid = _AuthenticationService.Verify(_DefaultAccount, _DefaultPassword, _DefaultOtp);
+
+            ShouldBeValid(_DefaultAccount, _DefaultPassword, _DefaultOtp);
+        }
+
+        [Test]
+        public void is_invalid()
+        {
+            GivenPassword(_DefaultAccount, _DefaultHashedPassword);
+
+            GivenHash(_DefaultPassword, _DefaultHashedPassword);
+
+            GivenOtp(_DefaultAccount, _DefaultOtp);
+
+            ShouldBeInvalid(_DefaultAccount, _DefaultPassword, _DefaultOtp);
+        }
+
+        private bool WhenInvalid()
+        {
+            GivenPassword(_DefaultAccount, _DefaultHashedPassword);
+
+            GivenHash(_DefaultPassword, _DefaultHashedPassword);
+
+            GivenOtp(_DefaultAccount, _DefaultOtp);
+
+            return _AuthenticationService.Verify(_DefaultAccount, _DefaultPassword, "wrong otp");
+        }
+
+        [Test]
+        public void should_notify_user_when_invalid()
+        {
+            WhenInvalid();
+            ShouldNotify(_DefaultAccount);
+        }
+
+        private void ShouldNotify(string account)
+        {
+            _Notification.Received(1).Notify(Arg.Is<string>(message => message.Contains(account)));
+        }
+
+        private void ShouldBeValid(string account, string password, string otp)
+        {
+            var isValid = _AuthenticationService.Verify(account, password, otp);
 
             Assert.IsTrue(isValid);
+        }
+        private void ShouldBeInvalid(string account, string password, string otp)
+        {
+            var isValid = _AuthenticationService.Verify(account, password, otp);
+
+            Assert.IsFalse(isValid);
         }
 
         private void GivenHash(string password, string hashedPassword)
