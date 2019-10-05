@@ -85,6 +85,7 @@
     <Compile Include="Models\ILogger.cs" />
     <Compile Include="Models\INotification.cs" />
     <Compile Include="Models\IOtp.cs" />
+    <Compile Include="Models\LogFailedCountDecorator.cs" />
     <Compile Include="Models\NLoggerAdapter.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\NotificationDecorator.cs" />
