@@ -1,38 +1,18 @@
-﻿using Dapper;
-using SlackAPI;
+﻿using SlackAPI;
 using System;
-using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 
 namespace DependencyInjectionWorkshop.Models
 {
-    public class ProfileDao
-    {
-        public string GetPasswordFromDb(string accountId)
-        {
-            string passwordFromDb;
-            using (var connection = new SqlConnection("my connection string"))
-            {
-                var password1 = connection.Query<string>("spGetUserPassword", new { Id = accountId },
-                    commandType: CommandType.StoredProcedure).SingleOrDefault();
-
-                passwordFromDb = password1;
-            }
-
-            return passwordFromDb;
-        }
-    }
-
     public class AuthenticationService
     {
         private readonly ProfileDao _ProfileDao;
+        private readonly Sha256Adapter _Sha256Adapter;
 
         public AuthenticationService()
         {
             _ProfileDao = new ProfileDao();
+            _Sha256Adapter = new Sha256Adapter();
         }
 
         public bool Verify(string accountId, string password, string otp)
@@ -44,7 +24,7 @@ namespace DependencyInjectionWorkshop.Models
 
             var passwordFromDb = _ProfileDao.GetPasswordFromDb(accountId);
 
-            var hashedPassword = HashPassword(password);
+            var hashedPassword = _Sha256Adapter.ComputeHash(password);
 
             var currentOtp = GetOtp(accountId);
 
@@ -115,20 +95,6 @@ namespace DependencyInjectionWorkshop.Models
 
             string currentOtp = response.Content.ReadAsAsync<string>().Result;
             return currentOtp;
-        }
-
-        private static string HashPassword(string password)
-        {
-            var crypt = new System.Security.Cryptography.SHA256Managed();
-            var hash = new StringBuilder();
-            var crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(password));
-            foreach (var theByte in crypto)
-            {
-                hash.Append(theByte.ToString("x2"));
-            }
-
-            var hashedPassword = hash.ToString();
-            return hashedPassword;
         }
     }
 
